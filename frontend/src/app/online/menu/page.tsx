@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { useOnlineCart } from "@/context/OnlinecartContext";
+import { useOnlineCart } from "@/context/OnlineCartContext";
 
 interface MenuItem {
   item_id: string;

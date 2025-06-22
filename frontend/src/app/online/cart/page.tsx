@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useOnlineCart } from "@/context/OnlinecartContext";
+import { useOnlineCart } from "@/context/OnlineCartContext";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
