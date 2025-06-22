@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderManager from "@/components/HeaderManager";
 import { DineCartProvider, useDineCart } from "@/context/DineCartContext";
-import { OnlineCartProvider, useOnlineCart } from "@/context/OnlinecartContext";
+import { OnlineCartProvider, useOnlineCart } from "@/context/OnlineCartContext";
 import AuthGuard from "@/components/AuthGuard";
 
 const geistSans = Geist({
