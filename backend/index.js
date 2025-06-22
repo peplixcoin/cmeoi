@@ -42,6 +42,11 @@ app.use(
 );
 app.use(bodyParser.json());
 
+
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
