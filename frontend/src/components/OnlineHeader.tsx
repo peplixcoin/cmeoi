@@ -5,7 +5,6 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useOnlineCart } from "@/context/OnlineCartContext";
-import Image from "next/image";
 
 export default function OnlineHeader() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

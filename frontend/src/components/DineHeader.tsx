@@ -5,7 +5,6 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useDineCart } from "@/context/DineCartContext";
-import Image from "next/image";
 
 export default function DineHeader() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

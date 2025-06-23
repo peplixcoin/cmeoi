@@ -21,7 +21,7 @@ export default function SignIn() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Username: username, Password: password }),
       });
-    
+
       const data = await response.json();
 
       if (response.ok) {
@@ -32,7 +32,7 @@ export default function SignIn() {
       } else {
         setError(data.message);
       }
-    } catch (error) {
+    } catch {
       setError("Sign-in failed. Please try again.");
     }
   };
@@ -57,7 +57,9 @@ export default function SignIn() {
             className="ml-14"
           />
         </div>
+
         {error && <p className="text-red-500 text-center">{error}</p>}
+
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
           <input
             type="text"
@@ -82,8 +84,9 @@ export default function SignIn() {
             Login
           </button>
         </form>
+
         <p className="text-center mt-4">
-          Don't have password?{" "}
+          Don&rsquo;t have password?{" "}
           <a href="/reset-password" className="text-blue-500 hover:underline">
             Reset Password
           </a>

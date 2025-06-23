@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Cookies from "js-cookie";
 import Modal from "@/components/Modal";
 import { use } from "react";
@@ -86,8 +85,7 @@ export default function LoungeDetails({
           `${process.env.NEXT_PUBLIC_API_URL}/api/lounges/${params.loungeId}`
         );
         if (!response.ok) throw new Error("Failed to fetch lounge");
-        const data = await response.json();
-        setLounge(data);
+        setLounge(await response.json());
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -815,7 +813,7 @@ export default function LoungeDetails({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                 placeholder="Enter transaction ID after payment"
                 required
-              />
+            />
             </div>
 
             <button

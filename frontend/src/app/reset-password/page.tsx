@@ -14,12 +14,11 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Handle redirect after successful password reset
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
         router.push("/signin");
-      }, 5000); // Redirect after 5 seconds
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [message, router]);
@@ -48,7 +47,7 @@ export default function ForgotPassword() {
       } else {
         setError(data.message || "Failed to reset password");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -59,37 +58,22 @@ export default function ForgotPassword() {
     <div className="flex flex-col items-center pt-20 min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md mx-8">
         <div className="flex items-center justify-between mb-4">
-  <Image
-    src="/cmelogo.png"
-    alt="Left Icon"
-    width={28}
-    height={28}
-    className="pt-1"
-  />
-  <h1 className="text-lg md:text-xl font-bold text-center flex-grow text-center">
-    Reset Password
-  </h1>
-  <Image
-    src="/oilogo.png"
-    alt="Right Icon"
-    width={24}
-    height={24}
-  />
-</div>
+          <Image src="/cmelogo.png" alt="Left Icon" width={28} height={28} className="pt-1" />
+          <h1 className="text-lg md:text-xl font-bold text-center flex-grow text-center">
+            Reset Password
+          </h1>
+          <Image src="/oilogo.png" alt="Right Icon" width={24} height={24} />
+        </div>
 
         <p className="text-center mb-6 text-gray-600">
           Enter your details to receive a new password
         </p>
 
         {message && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
-            {message}
-          </div>
+          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">{message}</div>
         )}
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-            {error}
-          </div>
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">

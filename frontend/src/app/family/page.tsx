@@ -11,6 +11,13 @@ type FamilyMember = {
   name: string;
 };
 
+type UserData = {
+  username: string;
+  address: string;
+  mobile_no: string;
+  role: "main" | "family" | string;
+};
+
 const relationTypes = [
   { value: 2, label: "Wife" },
   { value: 3, label: "Son" },
@@ -27,7 +34,7 @@ export default function FamilyPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +48,6 @@ export default function FamilyPage() {
       }
 
       try {
-        // Fetch user details
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${username}`);
         if (!res.ok) throw new Error("Failed to fetch user data");
         const data = await res.json();
@@ -53,7 +59,6 @@ export default function FamilyPage() {
           role: data.role,
         });
 
-        // Fetch family members (only for main members)
         if (data.role !== "family") {
           const familyRes = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/user/${username}/family`
@@ -75,8 +80,6 @@ export default function FamilyPage() {
 
   const generateFamilyUsername = (relation: number) => {
     if (!userData?.username) return "";
-
-    // Remove the last character (which is 1 for main user)
     const baseUsername = userData.username.slice(0, -1);
     return `${baseUsername}${relation}`;
   };
@@ -95,20 +98,21 @@ export default function FamilyPage() {
           username: familyUsername,
           relation: newMember.relation,
           password: newMember.password,
-          mainUsername: userData.username,
+          mainUsername: userData?.username,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         if (response.status === 400 && errorData.message === "Family member already exists") {
-          throw new Error(`A family member with the relation "${relationTypes.find((t) => t.value === newMember.relation)?.label}" already exists.`);
+          throw new Error(
+            `A family member with the relation "${relationTypes.find((t) => t.value === newMember.relation)?.label}" already exists.`
+          );
         }
         throw new Error(errorData.message || "Failed to add family member");
       }
 
       const addedMember = await response.json();
-
       setFamilyMembers([...familyMembers, addedMember]);
       setNewMember({ relation: 2, password: "" });
       setSuccess("Family member added successfully!");
@@ -120,9 +124,7 @@ export default function FamilyPage() {
   };
 
   const handleDeleteMember = async (familyUsername: string) => {
-    if (!window.confirm(`Are you sure you want to delete ${familyUsername}?`)) {
-      return;
-    }
+    if (!window.confirm(`Are you sure you want to delete ${familyUsername}?`)) return;
 
     try {
       const response = await fetch(
@@ -134,7 +136,7 @@ export default function FamilyPage() {
             Authorization: `Bearer ${Cookies.get("token")}`,
           },
           body: JSON.stringify({
-            mainUsername: userData.username,
+            mainUsername: userData?.username,
           }),
         }
       );
@@ -143,9 +145,7 @@ export default function FamilyPage() {
         throw new Error(await response.text());
       }
 
-      setFamilyMembers(
-        familyMembers.filter((member) => member.username !== familyUsername)
-      );
+      setFamilyMembers(familyMembers.filter((member) => member.username !== familyUsername));
       setSuccess("Family member deleted successfully!");
       setError("");
     } catch (err) {
@@ -154,7 +154,6 @@ export default function FamilyPage() {
     }
   };
 
-  // Determine relation for family member
   const getRelationLabel = () => {
     if (userData?.role === "family") {
       const relationValue = parseInt(userData.username.slice(-1));
@@ -181,7 +180,6 @@ export default function FamilyPage() {
           <Link
             href="/signin"
             className="bg-indigo-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-all duration-300 font-medium text-sm sm:text-base"
-            aria-label="Sign in to access family management"
           >
             Sign In
           </Link>
@@ -192,24 +190,22 @@ export default function FamilyPage() {
 
   return (
     <div className="min-h-screen py-4 sm:py-8 px-4 sm:px-6 ">
-       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
-            <h1 className="text-base text-center font-bold text-white ">Manage Family Members</h1>
-          </div>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
+        <h1 className="text-base text-center font-bold text-white ">Manage Family Members</h1>
+      </div>
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-         
-
         {error && (
           <div className="mb-6 p-4 bg-red-100 text-red-800 rounded-lg border border-red-300 text-sm sm:text-base font-semibold text-center">
             {error}
           </div>
         )}
-
         {success && (
           <div className="mb-6 p-4 bg-green-100 text-green-800 rounded-lg border border-green-300 text-sm sm:text-base font-semibold text-center">
             {success}
           </div>
         )}
 
+        {/* User Info */}
         <div className="mb-8">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Your Information</h2>
           <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -234,50 +230,33 @@ export default function FamilyPage() {
           </div>
         </div>
 
+        {/* Add Member */}
         {userData.role !== "family" && (
           <div className="mb-8">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Add Family Member</h2>
             <div className="space-y-5">
               <div>
-                <label
-                  htmlFor="relation"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="relation" className="block text-sm font-medium text-gray-700 mb-1">
                   Relationship
                 </label>
-                <div className="relative">
-                  <select
-                    id="relation"
-                    value={newMember.relation}
-                    onChange={(e) =>
-                      setNewMember({ ...newMember, relation: parseInt(e.target.value) })
-                    }
-                    className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 appearance-none transition-all duration-300 text-sm sm:text-base cursor-pointer"
-                    aria-label="Select relationship"
-                  >
-                    {relationTypes.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                  <svg
-                    className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-5 sm:w-6 h-5 sm:h-6 text-gray-500 pointer-events-none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                <select
+                  id="relation"
+                  value={newMember.relation}
+                  onChange={(e) =>
+                    setNewMember({ ...newMember, relation: parseInt(e.target.value) })
+                  }
+                  className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50"
+                >
+                  {relationTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Family Member Password
                 </label>
                 <input
@@ -287,9 +266,8 @@ export default function FamilyPage() {
                   onChange={(e) =>
                     setNewMember({ ...newMember, password: e.target.value })
                   }
-                  className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition-all duration-300 text-sm sm:text-base"
-                  placeholder="Enter password for family member"
-                  aria-label="Enter password for family member"
+                  className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg bg-gray-50"
+                  placeholder="Enter password"
                 />
               </div>
 
@@ -301,15 +279,14 @@ export default function FamilyPage() {
                   {generateFamilyUsername(newMember.relation)}
                 </p>
                 <p className="mt-1 text-xs text-gray-500">
-                  Note: Family members will use this username and the password you set to sign in.
+                  Family members will use this username and password to sign in.
                 </p>
               </div>
 
               <button
                 onClick={handleAddMember}
                 disabled={!newMember.password}
-                className="w-full py-3 sm:py-4 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 transition-all duration-300 font-medium text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed"
-                aria-label="Add family member"
+                className="w-full py-3 sm:py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
               >
                 Add Family Member
               </button>
@@ -317,6 +294,7 @@ export default function FamilyPage() {
           </div>
         )}
 
+        {/* Display Members */}
         {userData.role !== "family" && (
           <div>
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Your Family Members</h2>
@@ -344,8 +322,7 @@ export default function FamilyPage() {
                       <div className="flex sm:justify-end">
                         <button
                           onClick={() => handleDeleteMember(member.username)}
-                          className="mt-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 active:bg-red-800 transition-all duration-300 text-sm sm:text-base"
-                          aria-label={`Delete family member ${member.username}`}
+                          className="mt-2 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
                         >
                           Delete
                         </button>

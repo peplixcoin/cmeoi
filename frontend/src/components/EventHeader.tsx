@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 export default function EventHeader() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

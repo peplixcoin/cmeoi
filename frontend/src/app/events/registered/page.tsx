@@ -90,18 +90,18 @@ export default function RegisteredEventsPage() {
         useCORS: true,
         backgroundColor: "#ffffff",
         windowWidth: qrElement.scrollWidth,
-        windowHeight: qrElement.scrollHeight
+        windowHeight: qrElement.scrollHeight,
       });
 
       // Calculate PDF dimensions
       const imgWidth = 210; // A4 width in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
+
       // Create PDF with proper orientation
       const pdf = new jsPDF({
         orientation: imgHeight > imgWidth ? "portrait" : "landscape",
         unit: "mm",
-        format: [imgWidth, imgHeight]
+        format: [imgWidth, imgHeight],
       });
 
       // Add image to PDF
@@ -113,7 +113,7 @@ export default function RegisteredEventsPage() {
         imgWidth,
         imgHeight
       );
-      
+
       // Save PDF
       pdf.save(`ticket-${registrationId}.pdf`);
     } catch (err) {
@@ -135,9 +135,11 @@ export default function RegisteredEventsPage() {
   return (
     <main className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
-         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
-            <h1 className="text-base text-center font-bold text-white ">My Events</h1>
-          </div>
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
+          <h1 className="text-base text-center font-bold text-white">
+            My Events
+          </h1>
+        </div>
 
         {error ? (
           <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
@@ -145,7 +147,7 @@ export default function RegisteredEventsPage() {
           </div>
         ) : registrations.length === 0 ? (
           <div className="bg-blue-100 text-blue-800 p-4 rounded-md mb-6">
-            You haven't registered for any events yet.
+            {"You haven't registered for any events yet."}
           </div>
         ) : (
           <div className="space-y-6">
@@ -242,7 +244,7 @@ export default function RegisteredEventsPage() {
                           style={{
                             width: "100%",
                             maxWidth: "800px",
-                            boxSizing: "border-box"
+                            boxSizing: "border-box",
                           }}
                         >
                           <h3 className="text-xl font-bold mb-4 text-center">
@@ -262,23 +264,28 @@ export default function RegisteredEventsPage() {
                             <div className="flex-1">
                               <div className="space-y-3 text-gray-700">
                                 <p className="text-lg">
-                                  <span className="font-semibold">Event:</span> {reg.event?.name}
+                                  <span className="font-semibold">Event:</span>{" "}
+                                  {reg.event?.name}
                                 </p>
                                 <p>
                                   <span className="font-semibold">Date:</span>{" "}
                                   {reg.event?.date
-                                    ? new Date(reg.event.date).toLocaleDateString()
+                                    ? new Date(
+                                        reg.event.date
+                                      ).toLocaleDateString()
                                     : "N/A"}
                                 </p>
                                 <p>
-                                  <span className="font-semibold">Time:</span> {reg.event?.startTime} -{" "}
-                                  {reg.event?.endTime}
+                                  <span className="font-semibold">Time:</span>{" "}
+                                  {reg.event?.startTime} - {reg.event?.endTime}
                                 </p>
                                 <p>
-                                  <span className="font-semibold">Location:</span> {reg.event?.location}
+                                  <span className="font-semibold">Location:</span>{" "}
+                                  {reg.event?.location}
                                 </p>
                                 <p className="pt-4 text-sm text-gray-500 italic">
-                                  Present this QR code at the event entrance for check-in
+                                  Present this QR code at the event entrance for
+                                  check-in
                                 </p>
                               </div>
                             </div>

@@ -141,7 +141,7 @@ export default function UserBookings() {
 
         {bookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-6 text-center">
-            <p className="mb-4">You don't have any lounge bookings yet.</p>
+            <p className="mb-4">You do not have any lounge bookings yet.</p>
             <Link
               href="/lounge-booking/lounges"
               className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
