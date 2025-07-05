@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Cookies from "js-cookie";
-
+import Image from 'next/image';
 interface Booking {
   _id: string;
   loungeId: string;
@@ -157,7 +157,7 @@ export default function UserBookings() {
                   <div className="md:w-1/3">
                     <div className="h-48 bg-gray-200 overflow-hidden">
                       {booking.lounge.photos?.length > 0 ? (
-                        <img
+                        <Image
                           src={booking.lounge.photos[0]}
                           alt={booking.lounge.name}
                           className="w-full h-full object-cover"

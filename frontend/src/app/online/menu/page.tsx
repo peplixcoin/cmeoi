@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useOnlineCart } from "@/context/OnlineCartContext";
-
+import Image from 'next/image';
 interface MenuItem {
   item_id: string;
   item_name: string;
@@ -401,7 +401,7 @@ export default function OnlineMenuPage() {
                     </div>
 
                     <div className="w-[160px] h-[120px] flex-shrink-0 relative flex items-center justify-center overflow-hidden rounded-lg">
-                      <img
+                      <Image
                         src={item.item_img}
                         alt={item.item_name}
                         className="w-full h-full object-cover"
@@ -422,7 +422,7 @@ export default function OnlineMenuPage() {
                   {/* Desktop Layout - Vertical Card */}
                   <div className="hidden md:block">
                     <div className="relative">
-                      <img
+                      <Image
                         src={item.item_img}
                         alt={item.item_name}
                         className="w-full h-40 object-cover rounded-lg mb-4"

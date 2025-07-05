@@ -7,6 +7,15 @@ import { Star, FileText, Clock, Package, ShoppingBag, MessageSquare, CreditCard 
 import autoTable from "jspdf-autotable";
 import { useRouter } from "next/navigation";
 
+// Extend jsPDF interface to include lastAutoTable from jspdf-autotable
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable?: {
+      finalY: number;
+    };
+  }
+}
+
 interface OrderItem {
   item_id: string;
   item_name: string;
@@ -114,7 +123,7 @@ export default function DineOrderPage() {
     return () => {
       eventSource.close();
     };
-  }, [router]); // Added router to dependency array
+  }, [router]);
 
   const getOrderStatusLabel = (status: string) => {
     switch (status) {
@@ -141,7 +150,7 @@ export default function DineOrderPage() {
   };
 
   const downloadReceipt = (order: Order) => {
-    const pdf: jsPDF = new jsPDF(); // Explicitly type pdf as jsPDF
+    const pdf: jsPDF = new jsPDF();
 
     pdf.setFontSize(18);
     pdf.text("Order Receipt", 14, 20);
@@ -171,7 +180,7 @@ export default function DineOrderPage() {
       headStyles: { fillColor: [79, 70, 229] },
     });
 
-    const finalY = (pdf as any).lastAutoTable.finalY || 60; // Type assertion for lastAutoTable
+    const finalY = pdf.lastAutoTable?.finalY || 60; // Use optional chaining for safety
     pdf.text("===========================================", 14, finalY + 10);
     pdf.text(`Total Amount: ₹${order.total_amt.toFixed(2)}`, 14, finalY + 20);
     pdf.text(
@@ -194,20 +203,16 @@ export default function DineOrderPage() {
     const upiId = "simran905690@axl"; // Replace with your actual UPI ID
     const note = `Payment for order #${order.order_id.slice(-6)}`;
 
-    // Create UPI payment URL
     const upiUrl = `upi://pay?pa=${upiId}&pn=Restaurant%20Name&am=${amount}&tn=${encodeURIComponent(
       note
     )}&cu=INR`;
 
-    // For web fallback
     const webUrl = `https://upayi.in/pay?pa=${upiId}&pn=Restaurant%20Name&am=${amount}&tn=${encodeURIComponent(
       note
     )}&cu=INR`;
 
-    // Try to open UPI app
     window.location.href = upiUrl;
 
-    // Fallback if UPI app not available
     setTimeout(() => {
       window.open(webUrl, "_blank");
     }, 500);
@@ -286,8 +291,8 @@ export default function DineOrderPage() {
 
   const getPaymentStatusColor = (status: string) => {
     return status === "paid"
-      ? "bg-green-100 text-green-800"
-      : "bg-red-100 text-red-800";
+    ? "bg-green-100 text-green-800"
+    : "bg-red-100 text-red-800";
   };
 
   return (

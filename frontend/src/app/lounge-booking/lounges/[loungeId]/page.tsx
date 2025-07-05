@@ -8,7 +8,7 @@ import { use } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment-timezone";
-
+import Image from 'next/image';
 interface Lounge {
   _id: string;
   name: string;
@@ -305,7 +305,7 @@ export default function LoungeDetails({
         throw new Error(errorData.message || "Booking failed");
       }
 
-      const data = await response.json();
+      await response.json();
       alert("Booking submitted successfully! Status: Pending");
       router.push("/lounge-booking/bookings");
     } catch (error: unknown) {
@@ -335,7 +335,7 @@ export default function LoungeDetails({
             <div className="sm:w-1/2 p-4 sm:p-6">
               <div className="h-56 sm:h-80 rounded-lg overflow-hidden shadow-md mb-4 relative">
                 {lounge.photos && lounge.photos.length > 0 ? (
-                  <img
+                  <Image
                     src={lounge.photos[currentPhotoIndex]}
                     alt={`${lounge.name} - Photo ${currentPhotoIndex + 1}`}
                     className="w-full h-full object-cover transition-all duration-300 ease-in-out"
@@ -358,7 +358,7 @@ export default function LoungeDetails({
                               : "border-gray-200 hover:border-blue-300"
                           }`}
                       >
-                        <img
+                        <Image
                           src={photoUrl}
                           alt={`Thumbnail ${index + 1}`}
                           className="w-full h-full object-cover"

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
+import Image from 'next/image';
 interface Lounge {
   _id: string;
   name: string;
@@ -77,7 +77,7 @@ export default function LoungesList() {
             >
               <div className="h-48 sm:h-56 bg-gray-100 overflow-hidden">
                 {lounge.photos?.length > 0 ? (
-                  <img
+                  <Image
                     src={lounge.photos[0]}
                     alt={`Image of ${lounge.name}`}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"

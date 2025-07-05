@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import { QRCodeSVG } from "qrcode.react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import Image from 'next/image';
 
 interface Registration {
   _id: string;
@@ -158,7 +159,7 @@ export default function RegisteredEventsPage() {
               >
                 {reg.event?.imageUrl && (
                   <div className="h-48 bg-gray-200">
-                    <img
+                    <Image
                       src={reg.event.imageUrl}
                       alt={reg.event.name}
                       className="w-full h-full object-cover"
