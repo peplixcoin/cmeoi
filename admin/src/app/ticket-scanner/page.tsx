@@ -66,10 +66,10 @@ export default function TicketScannerPage() {
       stream.getTracks().forEach((track) => track.stop());
       setHasPermission(true);
       return true;
-    } catch (err: any) {
-     
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       setHasPermission(false);
-      toast.error(`Camera access failed: ${err.message}`);
+      toast.error(`Camera access failed: ${error.message}`);
       return false;
     }
   };
@@ -129,15 +129,14 @@ export default function TicketScannerPage() {
       const result = await response.json();
       setRegistration(result.registration);
       toast.success("Ticket verified successfully!");
-    } catch (err: any) {
-     
-      
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       let errorMessage = "Verification failed";
-      if (err.message.includes("not found") || err.message.includes("not approved")) {
+      if (error.message.includes("not found") || error.message.includes("not approved")) {
         errorMessage = "Ticket not found";
-      } else if (err.message.includes("Invalid ticket format")) {
-        errorMessage = err.message;
-      } else if (err.message.includes("already occurred")) {
+      } else if (error.message.includes("Invalid ticket format")) {
+        errorMessage = error.message;
+      } else if (error.message.includes("already occurred")) {
         errorMessage = "This event has already passed";
       }
 
@@ -194,8 +193,8 @@ export default function TicketScannerPage() {
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
-            <h1 className="text-base text-center font-bold text-white ">Event Ticket Scanner</h1>
-          </div>
+          <h1 className="text-base text-center font-bold text-white">Event Ticket Scanner</h1>
+        </div>
 
         {!scannedData ? (
           showScanner ? (
@@ -213,7 +212,7 @@ export default function TicketScannerPage() {
                   constraints={{ facingMode: "environment" }}
                   styles={{
                     container: { width: "100%", height: "100%", position: "relative" },
-                    video: { objectFit: "cover" }
+                    video: { objectFit: "cover" },
                   }}
                 />
                 <div className="absolute inset-0 border-4 border-blue-400 rounded-lg pointer-events-none"></div>
@@ -291,7 +290,7 @@ export default function TicketScannerPage() {
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Event Details</h3>
                     <p>
-                      <span className="font-medium">Event:</span> {registration.event?.name}
+                      <span className="font-medium">Event:</span> {registration.event?.name || "N/A"}
                     </p>
                     <p>
                       <span className="font-medium">Date:</span>{" "}
@@ -301,11 +300,13 @@ export default function TicketScannerPage() {
                     </p>
                     <p>
                       <span className="font-medium">Time:</span>{" "}
-                      {registration.event?.startTime} - {registration.event?.endTime}
+                      {registration.event?.startTime && registration.event?.endTime
+                        ? `${registration.event.startTime} - ${registration.event.endTime}`
+                        : "N/A"}
                     </p>
                     <p>
                       <span className="font-medium">Location:</span>{" "}
-                      {registration.event?.location}
+                      {registration.event?.location || "N/A"}
                     </p>
                   </div>
                 </div>

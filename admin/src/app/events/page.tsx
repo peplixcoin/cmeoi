@@ -101,12 +101,12 @@ export default function AdminEventsPage() {
       // If it has AM/PM, convert it
       if (timeStr.includes('AM') || timeStr.includes('PM')) {
         const [time, period] = timeStr.split(' ');
-        let [hours, minutes] = time.split(':');
+        const [hours, minutes] = time.split(':');
         
         if (period === 'PM' && hours !== '12') {
-          hours = String(Number(hours) + 12);
+          return `${String(Number(hours) + 12).padStart(2, '0')}:${minutes}`;
         } else if (period === 'AM' && hours === '12') {
-          hours = '00';
+          return `00:${minutes}`;
         }
         
         return `${hours.padStart(2, '0')}:${minutes}`;
@@ -120,7 +120,7 @@ export default function AdminEventsPage() {
   const convertTimeToAmPm = (timeStr: string) => {
     if (!timeStr) return '';
     
-    let [hours, minutes] = timeStr.split(':');
+    const [hours, minutes] = timeStr.split(':');
     const hoursNum = parseInt(hours, 10);
     
     const period = hoursNum >= 12 ? 'PM' : 'AM';

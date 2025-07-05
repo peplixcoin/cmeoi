@@ -36,7 +36,7 @@ global.onlineOrderEmitter = new EventEmitter();
 
 app.use(
   cors({
-    origin: ['http://localhost:3001', 'http://localhost:3002','https://cmeoi-git-main-peplixs-projects.vercel.app','https://cmeoi.onrender.com'],
+    origin: ['http://localhost:3001', 'http://localhost:3002','https://cmeoi-git-main-peplixs-projects.vercel.app','https://cmeoi.onrender.com','https://cmeoi.vercel.app'],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })

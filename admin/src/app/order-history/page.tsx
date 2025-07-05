@@ -7,6 +7,19 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
+// Extend jsPDF interface to include autoTable
+declare module "jspdf" {
+  interface jsPDF {
+    autoTable(options: {
+      head: string[][];
+      body: (string | number)[][];
+      startY?: number;
+      styles?: { fontSize?: number };
+      columnStyles?: { [key: number]: { cellWidth?: number } };
+    }): void;
+  }
+}
+
 interface OrderItem {
   item_id: string;
   item_name: string;
@@ -37,11 +50,6 @@ interface OrderResponse {
 export default function OrdersPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"dine" | "online">("dine");
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState<
-    "all" | "pending" | "approved" | "completed"
-  >("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -89,9 +97,16 @@ export default function OrdersPage() {
         activeTab === "dine"
           ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/current-month?page=${page}&limit=10`
           : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/online/current-month?page=${page}&limit=10`;
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("adminToken")}`,
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch current month orders");
+      }
       const data: OrderResponse = await response.json();
-
       setCurrentMonthData((prev) => ({
         ...data,
         orders: page === 1 ? data.orders : [...prev.orders, ...data.orders],
@@ -110,8 +125,16 @@ export default function OrdersPage() {
         activeTab === "dine"
           ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/month/${month}`
           : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/online/month/${month}`;
-      const response = await fetch(endpoint);
-      const data = await response.json();
+      const response = await fetch(endpoint, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("adminToken")}`,
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch monthly orders");
+      }
+      const data: Order[] = await response.json();
       setMonthlyFilteredOrders(data);
     } catch (error) {
       console.error("Error fetching monthly orders:", error);
@@ -127,27 +150,22 @@ export default function OrdersPage() {
         activeTab === "dine"
           ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/date/${date}`
           : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/online/date/${date}`;
-      const response = await fetch(endpoint);
-      const data = await response.json();
+      const response = await fetch(endpoint, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("adminToken")}`,
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch daily orders");
+      }
+      const data: Order[] = await response.json();
       setDailyFilteredOrders(data);
     } catch (error) {
       console.error("Error fetching daily orders:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterOrders = (
-    status: "all" | "pending" | "approved" | "completed",
-    ordersData?: Order[]
-  ) => {
-    const data = ordersData || orders;
-    if (status === "all") {
-      setFilteredOrders(data);
-    } else {
-      setFilteredOrders(data.filter((order) => order.order_status === status));
-    }
-    setSelectedStatus(status);
   };
 
   useEffect(() => {
@@ -204,43 +222,6 @@ export default function OrdersPage() {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
-  const downloadPDF = (ordersData: Order[], fileName: string) => {
-    const doc = new jsPDF();
-    const tableData = ordersData.map((order) => [
-      order.order_id || "N/A",
-      order.username || "N/A",
-      order.total_amt?.toFixed(2) || "N/A",
-      order.order_time
-        ? new Date(order.order_time).toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })
-        : "N/A",
-      order.order_status || "N/A",
-      order.payment_status || "N/A",
-    ]);
-
-    doc.text(fileName, 14, 10);
-    (doc as any).autoTable({
-      head: [
-        [
-          "Order ID",
-          "Username",
-          "Total Amount",
-          "Order Date",
-          "Order Status",
-          "Payment Status",
-        ],
-      ],
-      body: tableData,
-      startY: 20,
-      styles: { fontSize: 8 },
-    });
-
-    doc.save(`${fileName}.pdf`);
-  };
-
   const handleGenerateMonthlyExcel = () => {
     if (!selectedMonth) {
       alert("Please select a month first!");
@@ -260,6 +241,28 @@ export default function OrdersPage() {
     downloadExcel(
       validOrders,
       `${activeTab === "dine" ? "Dine-in" : "Online"}Orders_${selectedMonth}`
+    );
+  };
+
+  const handleGenerateDailyExcel = () => {
+    if (!selectedDate) {
+      alert("Please select a date first!");
+      return;
+    }
+
+    const validOrders = dailyFilteredOrders.filter(
+      (order) =>
+        order.order_status === "completed" && order.payment_status === "paid"
+    );
+
+    if (validOrders.length === 0) {
+      alert("No valid completed and paid orders found for this date.");
+      return;
+    }
+
+    downloadExcel(
+      validOrders,
+      `${activeTab === "dine" ? "Dine-in" : "Online"}Orders_${selectedDate}`
     );
   };
 
@@ -304,39 +307,15 @@ export default function OrdersPage() {
       10
     );
 
-    (doc as any).autoTable({
+    doc.autoTable({
       head: [["ID", "Username", "Amount", "Date"]],
       body: tableData,
       startY: 20,
-      didDrawPage: (data: any) => {
-        doc.setFontSize(10);
-      },
+      styles: { fontSize: 10 },
     });
 
     doc.save(
       `${activeTab === "dine" ? "Dine-in" : "Online"}Orders_Report_${selectedMonth}.pdf`
-    );
-  };
-
-  const handleGenerateDailyExcel = () => {
-    if (!selectedDate) {
-      alert("Please select a date first!");
-      return;
-    }
-
-    const validOrders = dailyFilteredOrders.filter(
-      (order) =>
-        order.order_status === "completed" && order.payment_status === "paid"
-    );
-
-    if (validOrders.length === 0) {
-      alert("No valid completed and paid orders found for this date.");
-      return;
-    }
-
-    downloadExcel(
-      validOrders,
-      `${activeTab === "dine" ? "Dine-in" : "Online"}Orders_${selectedDate}`
     );
   };
 
@@ -377,13 +356,11 @@ export default function OrdersPage() {
       10
     );
 
-    (doc as any).autoTable({
+    doc.autoTable({
       head: [["ID", "Username", "Amount", "Time"]],
       body: tableData,
       startY: 20,
-      didDrawPage: (data: any) => {
-        doc.setFontSize(10);
-      },
+      styles: { fontSize: 10 },
     });
 
     doc.save(

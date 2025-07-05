@@ -7,7 +7,6 @@ import { useRouter, usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 import { useEffect, useState, useRef } from "react";
 import { Menu, X, User } from "lucide-react";
-import Image from "next/image";
 
 export default function Header() {
   const router = useRouter();

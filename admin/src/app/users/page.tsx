@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-// No Link component needed here unless you add navigation similar to HomePage
 
 interface GuestUser {
   _id: string;
@@ -43,8 +42,6 @@ export default function UsersPage() {
     const role = Cookies.get("adminRole");
 
     if (!token || role !== "SuperAdmin") {
-      // Basic role check, actual redirection logic from reference is not fully applicable here
-      // but if you need redirection based on other roles for this page, it can be added.
       router.push("/login");
       return;
     }
@@ -64,8 +61,9 @@ export default function UsersPage() {
         }
         const data = await response.json();
         setUsers(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(error.message || "Failed to fetch users");
       } finally {
         setLoading(false);
       }
@@ -84,7 +82,7 @@ export default function UsersPage() {
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("adminToken");
-    setError(null); // Clear previous errors
+    setError(null);
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/guest`, {
@@ -104,10 +102,8 @@ export default function UsersPage() {
       }
 
       const newUserResponse = await response.json();
-      // Assuming the API returns { user: GuestUser } or similar structure
       setUsers((prev) => [...prev, newUserResponse.user || newUserResponse]);
       setFormData({
-        // Reset form
         service: "",
         Name: "",
         Password: "",
@@ -115,14 +111,15 @@ export default function UsersPage() {
         email: "",
         address: "",
       });
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Failed to add user");
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
     const token = Cookies.get("adminToken");
-    setError(null); // Clear previous errors
+    setError(null);
 
     if (!confirm("Are you sure you want to delete this user?")) {
       return;
@@ -147,8 +144,9 @@ export default function UsersPage() {
       }
 
       setUsers((prev) => prev.filter((user) => user._id !== userId));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Failed to delete user");
     }
   };
 
@@ -161,7 +159,7 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="min-h-screen  p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {error && (
           <div
@@ -176,7 +174,7 @@ export default function UsersPage() {
         {/* Add User Form Card */}
         <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 mb-10 max-w-3xl mx-auto">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl py-2 shadow-lg">
-            <h1 className="text-base text-center font-bold text-white ">
+            <h1 className="text-base text-center font-bold text-white">
               Add New Guest User
             </h1>
           </div>
@@ -369,25 +367,25 @@ export default function UsersPage() {
                       className="hover:bg-slate-50 transition-colors duration-150"
                     >
                       <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-800 font-medium">
-                        {user.Username}
+                        {user.Username || "N/A"}
                       </td>
                       <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600">
-                        {user.Name}
+                        {user.Name || "N/A"}
                       </td>
                       <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600">
-                        {user.mobile_no}
+                        {user.mobile_no || "N/A"}
                       </td>
                       <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600">
-                        {user.email}
+                        {user.email || "N/A"}
                       </td>
                       <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-slate-600 max-w-xs truncate">
-                        {user.address}
+                        {user.address || "N/A"}
                       </td>
                       <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => handleDeleteUser(user._id)}
                           className="text-red-600 hover:text-red-700 font-semibold py-1 px-2 rounded-md hover:bg-red-50 transition-all duration-150 ease-in-out"
-                          aria-label={`Delete user ${user.Name}`}
+                          aria-label={`Delete user ${user.Name || "unknown"}`}
                         >
                           Delete
                         </button>

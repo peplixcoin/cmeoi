@@ -7,6 +7,19 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
+// Extend jsPDF interface to include autoTable
+declare module "jspdf" {
+  interface jsPDF {
+    autoTable(options: {
+      head: string[][];
+      body: (string | number)[][];
+      startY?: number;
+      styles?: { fontSize?: number };
+      columnStyles?: { [key: number]: { cellWidth?: number } };
+    }): void;
+  }
+}
+
 interface Rating {
   taste: number;
   service: number;
@@ -99,12 +112,20 @@ export default function FeedbackPage() {
     const fetchDineFeedbacks = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/admin/feedback/dine/all`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/admin/feedback/dine/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        if (!response.ok) throw new Error("Failed to fetch dine feedbacks");
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch dine feedbacks");
+        }
         const data = await response.json();
         setDineFeedbacks(data);
-      } catch (err) {
+      } catch {
         setError("Error fetching dine feedbacks");
       }
     };
@@ -112,12 +133,20 @@ export default function FeedbackPage() {
     const fetchOnlineFeedbacks = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/admin/feedback/online/all`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/admin/feedback/online/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        if (!response.ok) throw new Error("Failed to fetch online feedbacks");
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch online feedbacks");
+        }
         const data = await response.json();
         setOnlineFeedbacks(data);
-      } catch (err) {
+      } catch {
         setError("Error fetching online feedbacks");
       }
     };
@@ -182,19 +211,7 @@ export default function FeedbackPage() {
       10
     );
 
-    const tableData = feedbacks.map((feedback) => [
-      feedback.username || "N/A",
-      feedback.order_id || "N/A",
-      feedback.avgRating?.toFixed(1) || "N/A",
-      feedback.ratings?.taste ? `${feedback.ratings.taste}/5` : "N/A",
-      feedback.ratings?.service ? `${feedback.ratings.service}/5` : "N/A",
-      feedback.ratings?.hygiene ? `${feedback.ratings.hygiene}/5` : "N/A",
-      feedback.ratings?.behavior ? `${feedback.ratings.behavior}/5` : "N/A",
-      feedback.comment || "N/A",
-      formatDate(feedback.created_at) || "N/A",
-    ]);
-
-    (doc as any).autoTable({
+    doc.autoTable({
       head: [
         [
           "Username",
@@ -208,7 +225,17 @@ export default function FeedbackPage() {
           "Date",
         ],
       ],
-      body: tableData,
+      body: feedbacks.map((feedback) => [
+        feedback.username || "N/A",
+        feedback.order_id || "N/A",
+        feedback.avgRating?.toFixed(1) || "N/A",
+        feedback.ratings?.taste ? `${feedback.ratings.taste}/5` : "N/A",
+        feedback.ratings?.service ? `${feedback.ratings.service}/5` : "N/A",
+        feedback.ratings?.hygiene ? `${feedback.ratings.hygiene}/5` : "N/A",
+        feedback.ratings?.behavior ? `${feedback.ratings.behavior}/5` : "N/A",
+        feedback.comment || "N/A",
+        formatDate(feedback.created_at) || "N/A",
+      ]),
       startY: 20,
       styles: { fontSize: 8 },
       columnStyles: { 7: { cellWidth: 40 } },
@@ -230,11 +257,11 @@ export default function FeedbackPage() {
   const feedbacks = activeTab === "dine" ? dineFeedbacks : onlineFeedbacks;
 
   return (
-    <div className=" pt-4 pb-4 px-4 min-h-screen">
+    <div className="pt-4 pb-4 px-4 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl px-6 py-2 shadow-lg">
-            <h1 className="text-base text-center font-bold text-white ">Order Feedbacks</h1>
-          </div>
+          <h1 className="text-base text-center font-bold text-white">Order Feedbacks</h1>
+        </div>
 
         {/* Tab Navigation */}
         <div className="mt-4 flex justify-center mb-4">
@@ -251,7 +278,7 @@ export default function FeedbackPage() {
           <button
             className={`px-4 py-2 mx-2 rounded-lg ${
               activeTab === "online"
-                ? "bg-blue-500 text-white"
+                ? "bg-blue-500 text24-white"
                 : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setActiveTab("online")}

@@ -22,7 +22,7 @@ export default function InstructionPage() {
   useEffect(() => {
     const token = Cookies.get("adminToken");
     const role = Cookies.get("adminRole");
-    if (!token || (role !== "SuperAdmin")) {
+    if (!token || role !== "SuperAdmin") {
       router.push("/login");
     }
   }, [router]);
@@ -32,7 +32,7 @@ export default function InstructionPage() {
     const fetchInstructions = async () => {
       try {
         const token = Cookies.get("adminToken");
-        const response = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/instructions", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructions`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,7 +41,7 @@ export default function InstructionPage() {
         const data = await response.json();
         setInstructions(data);
         setError(null);
-      } catch (err) {
+      } catch {
         setError("Failed to load instructions. Please try again.");
       }
     };
@@ -57,7 +57,7 @@ export default function InstructionPage() {
     }
     try {
       const token = Cookies.get("adminToken");
-      const response = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/instructions", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/instructions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function InstructionPage() {
       setInstructions([addedInstruction, ...instructions]);
       setNewInstruction("");
       setError(null);
-    } catch (err) {
+    } catch {
       setError("Failed to add instruction. Please try again.");
     }
   };
@@ -107,7 +107,7 @@ export default function InstructionPage() {
       setEditingId(null);
       setEditingText("");
       setError(null);
-    } catch (err) {
+    } catch {
       setError("Failed to update instruction. Please try again.");
     }
   };
@@ -126,7 +126,7 @@ export default function InstructionPage() {
       if (!response.ok) throw new Error("Failed to delete instruction");
       setInstructions(instructions.filter((inst) => inst._id !== id));
       setError(null);
-    } catch (err) {
+    } catch {
       setError("Failed to delete instruction. Please try again.");
     }
   };
@@ -134,9 +134,9 @@ export default function InstructionPage() {
   return (
     <div className="min-h-screen p-4 max-w-5xl mx-auto">
       
-     <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
-            <h1 className="text-base text-center font-bold text-white ">Manage Announcements</h1>
-          </div>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-2 mb-4 shadow-lg">
+        <h1 className="text-base text-center font-bold text-white">Manage Announcements</h1>
+      </div>
 
       {/* Error Message */}
       {error && (

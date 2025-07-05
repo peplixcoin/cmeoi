@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Plus, Trash2, Edit, Loader2, UploadCloud, XCircle } from "lucide-react";
@@ -135,7 +135,6 @@ export default function AdminLoungesPage() {
     // The backend needs logic to compare and delete from Cloudinary if a URL is no longer present.
   };
 
-
   // Modal handlers
   const openAddModal = () => {
     setCurrentLounge(null);
@@ -192,7 +191,6 @@ export default function AdminLoungesPage() {
       // and `req.files` (named 'photos') for new image files.
       dataPayload.append('existingPhotosToKeep', JSON.stringify(formData.existingPhotos));
     }
-
 
     try {
       const url = currentLounge
@@ -251,7 +249,6 @@ export default function AdminLoungesPage() {
     }
   };
 
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -295,7 +292,7 @@ export default function AdminLoungesPage() {
           <div className="text-center text-gray-500 py-10 bg-white rounded-lg shadow">
             <UploadCloud size={48} className="mx-auto mb-4 text-gray-400" />
             <p className="text-xl">No lounges found.</p>
-            <p className="mt-2">Click "Add New Lounge" to get started.</p>
+            <p className="mt-2">Click Add New Lounge to get started.</p>
           </div>
         )}
 
@@ -360,7 +357,6 @@ export default function AdminLoungesPage() {
                     <XCircle size={24} />
                 </button>
             </div>
-
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -461,7 +457,6 @@ export default function AdminLoungesPage() {
                   </div>
                 )}
               </div>
-
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button

@@ -109,8 +109,8 @@ export default function OrdersPage() {
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
       return response;
-    } catch (error: unknown) {
-      if (retries <= 1) throw error;
+    } catch (err: unknown) {
+      if (retries <= 1) throw err;
       await new Promise((resolve) => setTimeout(resolve, delay));
       return fetchWithRetry(url, options, retries - 1, delay * 2);
     }
@@ -137,8 +137,8 @@ export default function OrdersPage() {
 
       setOrders(combinedOrders);
       filterOrders(selectedStatus, selectedOrderType, combinedOrders);
-    } catch (error: unknown) {
-      console.error("Error fetching orders:", error);
+    } catch (err: unknown) {
+      console.error("Error fetching orders:", err);
     } finally {
       setIsLoading(false);
     }
@@ -151,8 +151,8 @@ export default function OrdersPage() {
       );
       const data = await response.json();
       setDeliveryMen(data);
-    } catch (error: unknown) {
-      console.error("Error fetching delivery men:", error);
+    } catch (err: unknown) {
+      console.error("Error fetching delivery men:", err);
       alert("Failed to fetch delivery men. Please try again.");
     }
   };
@@ -172,7 +172,7 @@ export default function OrdersPage() {
       setSelectedOrderId(null);
       setSelectedDeliveryManId("");
       await fetchTodaysOrders();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       alert("Failed to assign delivery man. Please try again.");
     }
   };
@@ -197,9 +197,9 @@ export default function OrdersPage() {
         throw new Error(errorData.message || "Failed to update order status");
       }
       await fetchTodaysOrders();
-    } catch (error: unknown) {
-      const err = error instanceof Error ? error : new Error("Unknown error");
-      alert(err.message || "Failed to update order status. Please try again.");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error("Unknown error");
+      alert(error.message || "Failed to update order status. Please try again.");
     }
   };
 
@@ -216,7 +216,7 @@ export default function OrdersPage() {
       });
       if (!response.ok) throw new Error("Failed to update payment status");
       await fetchTodaysOrders();
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       alert("Failed to update payment status. Please try again.");
     }
   };
@@ -404,7 +404,7 @@ export default function OrdersPage() {
         <div className="max-w-6xl mx-auto">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl px-6 py-2 shadow-lg">
             <h1 className="text-base text-center font-bold text-white">
-              Today's Orders
+              Today\'s Orders
             </h1>
           </div>
 
@@ -568,23 +568,23 @@ export default function OrdersPage() {
                         </h4>
                         <p className="text-sm text-gray-700 mt-1">
                           <span className="font-medium">Name:</span>{" "}
-                          {order.username}
+                          {order.username || "N/A"}
                         </p>
                         {order.isOnlineOrder ? (
                           <>
                             <p className="text-sm text-gray-700">
                               <span className="font-medium">Address:</span>{" "}
-                              {order.address}
+                              {order.address || "N/A"}
                             </p>
                             <p className="text-sm text-gray-700">
                               <span className="font-medium">Mobile:</span>{" "}
-                              {order.mobile_no}
+                              {order.mobile_no || "N/A"}
                             </p>
                           </>
                         ) : (
                           <p className="text-sm text-gray-700">
                             <span className="font-medium">Table:</span>{" "}
-                            {order.table_number}
+                            {order.table_number || "N/A"}
                           </p>
                         )}
                       </div>
@@ -596,11 +596,11 @@ export default function OrdersPage() {
                           </h4>
                           <p className="text-sm text-gray-700 mt-1">
                             <span className="font-medium">Name:</span>{" "}
-                            {order.deliverymanId.Username}
+                            {order.deliverymanId.Username || "N/A"}
                           </p>
                           <p className="text-sm text-gray-700">
                             <span className="font-medium">Mobile:</span>{" "}
-                            {order.deliverymanId.mobile_no}
+                            {order.deliverymanId.mobile_no || "N/A"}
                           </p>
                         </div>
                       )}
@@ -640,18 +640,18 @@ export default function OrdersPage() {
               </Masonry>
             ) : (
               <div className="text-center py-20">
-               <svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="h-16 w-16 mx-auto text-yellow-400"
-  viewBox="0 0 20 20"
-  fill="currentColor"
->
-  <path
-    fillRule="evenodd"
-    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-    clipRule="evenodd"
-  />
-</svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-16 w-16 mx-auto text-yellow-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
                 <p className="mt-4 text-gray-500 text-lg">
                   No orders found for the selected filters.
                 </p>
