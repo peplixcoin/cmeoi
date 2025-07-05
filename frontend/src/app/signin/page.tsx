@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import Image from "next/image";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
@@ -41,7 +40,7 @@ export default function SignIn() {
     <div className="flex flex-col items-center pt-20 min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md mx-8">
         <div className="flex items-center justify-center mb-4">
-          <Image
+          <img
             src="/cmelogo.png"
             alt="Left Icon"
             width={28}
@@ -49,7 +48,7 @@ export default function SignIn() {
             className="pt-1 mr-14"
           />
           <h1 className="text-lg md:text-xl font-bold text-center">Login</h1>
-          <Image
+          <img
             src="/oilogo.png"
             alt="Right Icon"
             width={24}

@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { QRCodeSVG } from "qrcode.react";
 import Modal from "@/components/Modal";
-import Image from 'next/image';
 // Base API URL
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 

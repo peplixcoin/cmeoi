@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, ArrowRight, AlertCircle } from "lucide-react";
-import Image from 'next/image';
 // Base API URL
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 
@@ -156,7 +155,7 @@ export default function EventPage() {
                   {/* Event Image */}
                   <div className="relative h-48 overflow-hidden">
                     {event.imageUrl ? (
-                      <Image
+                      <img
                         src={event.imageUrl}
                         alt={event.name}
                         className="w-full h-full object-cover"

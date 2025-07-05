@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 export default function ForgotPassword() {
   const [username, setUsername] = useState("");
@@ -58,11 +57,11 @@ export default function ForgotPassword() {
     <div className="flex flex-col items-center pt-20 min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md mx-8">
         <div className="flex items-center justify-between mb-4">
-          <Image src="/cmelogo.png" alt="Left Icon" width={28} height={28} className="pt-1" />
+          <img src="/cmelogo.png" alt="Left Icon" width={28} height={28} className="pt-1" />
           <h1 className="text-lg md:text-xl font-bold text-center flex-grow text-center">
             Reset Password
           </h1>
-          <Image src="/oilogo.png" alt="Right Icon" width={24} height={24} />
+          <img src="/oilogo.png" alt="Right Icon" width={24} height={24} />
         </div>
 
         <p className="text-center mb-6 text-gray-600">
