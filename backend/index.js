@@ -38,7 +38,7 @@ app.use(
   cors({
     origin: ['http://localhost:3001', 'http://localhost:3002','https://cmeoi-git-main-peplixs-projects.vercel.app','https://cmeoi.onrender.com','https://cmeoi.vercel.app','https://cmeoi-admin.vercel.app','https://cmeoi-admin-git-main-peplixs-projects.vercel.app','https://www.cmeoi.in','https://admin.cmeoi.in'],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
 );
 app.use(bodyParser.json());
